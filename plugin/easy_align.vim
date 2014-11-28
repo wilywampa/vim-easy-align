@@ -111,8 +111,21 @@ function! s:easy_align_op(type, ...)
   call s:generic_easy_align_op(a:type, a:0, 0)
 endfunction
 
+let s:helpfile = expand('<sfile>:h:h').'/interactive.txt'
 function! s:live_easy_align_op(type, ...)
-  call s:generic_easy_align_op(a:type, a:0, 1)
+  let previewheight_save = &previewheight
+  let &previewheight = 11
+  execute 'pedit +setlocal\ buftype=nofile\ filetype=help '.s:helpfile
+  normal! gv
+  redraw
+  try
+    call s:generic_easy_align_op(a:type, a:0, 1)
+  finally
+    silent! pclose
+    silent! execute "bdelete ".s:helpfile
+    execute "normal! \<C-\>\<C-n>"
+    let &previewheight = previewheight_save
+  endtry
 endfunction
 
 function! s:easy_align_repeat()
